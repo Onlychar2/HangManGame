@@ -143,9 +143,8 @@
 <body>
 
 <!-- Background Music -->
-<audio autoplay loop>
+<audio id="bg-music" loop>
     <source src="backgroundMusic.mp3" type="audio/mpeg">
-    Your browser does not support the audio element.
 </audio>
 
 <h2 class="main-title">Hangman: The Gallows</h2>
@@ -224,12 +223,14 @@
         const val = document.getElementById("secret-word").value.toUpperCase().trim();
         if (!val || !/^[A-Z]+$/.test(val)) return alert("Please enter a valid word (A-Z)!");
         
+        
         secretWord = val;
         
         // Hide setup and footer, show game
         document.getElementById("setup-screen").style.display = "none";
         document.getElementById("game-footer").style.display = "none";
         document.getElementById("game-screen").style.display = "block";
+        document.getElementById("bg-music").play();
         
         updateDisplay();
         renderKeys();
