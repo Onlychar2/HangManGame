@@ -143,7 +143,8 @@
 <body>
 
 <!-- Background Music -->
-<audio id="bg-music" loop>
+<audio id="bg-music" loop preload="auto">
+    <source src="backgroundMusic.mp3" type="audio/ogg">
     <source src="backgroundMusic.mp3" type="audio/mpeg">
 </audio>
 
@@ -200,6 +201,26 @@
     let secretWord = "";
     let guessed = [];
     let mistakes = 0;
+    const music = document.getElementById("bg-music");
+    
+    // Configurar volumen
+    music.volume = 0.3;
+
+    // Función para iniciar música cuando hay interacción del usuario
+    function playMusic() {
+        music.play().catch(function(error) {
+            console.log("Error reproduciendo música:", error);
+        });
+        // Remover los event listeners después de la primera interacción
+        document.removeEventListener('click', playMusic);
+        document.removeEventListener('keydown', playMusic);
+        document.removeEventListener('touchstart', playMusic);
+    }
+
+    // Esperar la primera interacción del usuario para reproducir música
+    document.addEventListener('click', playMusic);
+    document.addEventListener('keydown', playMusic);
+    document.addEventListener('touchstart', playMusic);
 
     // LEAF LOGIC
     function createLeaf() {
@@ -223,14 +244,17 @@
         const val = document.getElementById("secret-word").value.toUpperCase().trim();
         if (!val || !/^[A-Z]+$/.test(val)) return alert("Please enter a valid word (A-Z)!");
         
-        
         secretWord = val;
         
         // Hide setup and footer, show game
         document.getElementById("setup-screen").style.display = "none";
         document.getElementById("game-footer").style.display = "none";
         document.getElementById("game-screen").style.display = "block";
-        document.getElementById("bg-music").play();
+        
+        // Asegurar que la música esté sonando
+        music.play().catch(function(error) {
+            console.log("Esperando interacción del usuario para reproducir música...");
+        });
         
         updateDisplay();
         renderKeys();
@@ -272,8 +296,33 @@
         if (!win) document.getElementById("body-group").classList.add("dead");
     }
 
+    // Reset sin recargar la página
     function resetGame() {
-        location.reload();
+        // Volver a la pantalla de configuración
+        document.getElementById("setup-screen").style.display = "block";
+        document.getElementById("game-footer").style.display = "block";
+        document.getElementById("game-screen").style.display = "none";
+        
+        // Limpiar el input
+        document.getElementById("secret-word").value = "";
+        
+        // Reiniciar variables del juego
+        secretWord = "";
+        guessed = [];
+        mistakes = 0;
+        
+        // Limpiar el mensaje
+        document.getElementById("msg").innerText = "";
+        
+        // Remover clases del muñeco
+        for (let i = 1; i <= 6; i++) {
+            const part = document.getElementById(`p${i}`);
+            if (part) part.classList.remove("visible");
+        }
+        document.getElementById("body-group").classList.remove("dead");
+        
+        // LA MÚSICA SIGUE REPRODUCIÉNDOSE SIN REINICIARSE
+        // No hacemos nada con el audio, sigue sonando donde estaba
     }
 </script>
 </body>
